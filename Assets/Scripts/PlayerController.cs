@@ -1,14 +1,24 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour {
 	private Rigidbody rb;
 	public float Speed;
+	private int count;
+	public Text CountText;
+	public Text Success;
 
 	void Start()
 	{
 		rb = GetComponent<Rigidbody> ();
+		count = 0;
+		UpdateText ();	
+	}
+
+	void UpdateText (){
+		CountText.text = "Count: " + count.ToString ();
 	}
 
 	void Update(){
@@ -41,6 +51,12 @@ public class PlayerController : MonoBehaviour {
 	void OnTriggerEnter(Collider other) {
 		if (other.gameObject.CompareTag ("Pick Up")) {
 			other.gameObject.SetActive (false);
+			count++;
+			UpdateText ();
+			// Show the congratulatory message
+			if (count == 12) {
+				Success.gameObject.SetActive (true);
+			}
 		}
 	}
 
