@@ -9,12 +9,14 @@ public class PlayerController : MonoBehaviour {
 	private int count;
 	public Text CountText;
 	public Text Success;
+	public Text Failure;
 
 	void Start()
 	{
 		rb = GetComponent<Rigidbody> ();
 		count = 0;
 		UpdateText ();	
+		Input.gyro.enabled = true;
 	}
 
 	void UpdateText (){
@@ -35,15 +37,22 @@ public class PlayerController : MonoBehaviour {
 
 	void FixedUpdate ()
 	{
-		float moveHorizontal = Input.GetAxis ("Horizontal");
-		float moveVertical = Input.GetAxis ("Vertical");
+		float moveHorizontal = Input.GetAxis ("Horizontal") + Input.acceleration.x;
+		float moveVertical = Input.GetAxis ("Vertical") + Input.acceleration.y;
 		float jump= 0.0f;
 
 		if (Input.GetKeyDown (KeyCode.Space) && rb.position.y == .5) {
 			jump = 50;
 		}
 
-		Vector3 movement = new Vector3 (moveHorizontal, jump, moveVertical);
+		//Quaternion gyroQ = Input.gyro.attitude;
+		//Vector3 gyroV3 = gyroQ.eulerAngles;
+
+		Vector3 movement = new Vector3 (
+			moveHorizontal,
+			jump, 
+			moveVertical
+		);
 
 		rb.AddForce (movement * Speed);
 	}
@@ -56,6 +65,14 @@ public class PlayerController : MonoBehaviour {
 			// Show the congratulatory message
 			if (count == 12) {
 				Success.gameObject.SetActive (true);
+			}
+		}
+		else if (other.gameObject.CompareTag ("Enemy")) {
+			count--;
+			UpdateText ();
+			// Show the game over
+			if (count <= 0) {
+				Failure.gameObject.SetActive (true);
 			}
 		}
 	}
